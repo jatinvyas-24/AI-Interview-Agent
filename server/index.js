@@ -12,7 +12,7 @@ import paymentRouter from "./src/routes/payment.route.js";
 const app = express();
 app.use(
   cors({
-    origin: "https://examnotesai-client-t0bl.onrender.com",
+    origin: "https://ai-interview-agent-client-ry2r.onrender.com",
     credentials: true,
   }),
 );
