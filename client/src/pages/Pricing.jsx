@@ -82,16 +82,27 @@ const Pricing = () => {
         order_id: result.data.id,
 
         handler: async (response) => {
-          const verifypay = await axios.post(
-            ServerUrl + "/api/payment/verify",
-            response,
-            { withCredentials: true },
-          );
+          try {
+            const verifypay = await axios.post(
+              ServerUrl + "/api/payment/verify",
+              response,
+              { withCredentials: true },
+            );
 
-          dispatch(setUserData(verifypay.data.user));
+            dispatch(setUserData(verifypay.data.user));
 
-          alert("Payment Successful. Credits Added.");
-          navigate("/");
+            alert("Payment Successful. Credits Added.");
+            navigate("/");
+          } catch (err) {
+            console.log(err);
+            alert("Payment verification failed. Please contact support.");
+            setLoadingPlan(null);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setLoadingPlan(null);
+          },
         },
         theme: {
           color: "#10b981",
@@ -105,6 +116,8 @@ const Pricing = () => {
       setLoadingPlan(null);
     } catch (error) {
       console.log(error);
+      alert("Failed to initiate payment. Please try again.");
+      setLoadingPlan(null);
     }
   };
 
@@ -187,7 +200,7 @@ const Pricing = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isSelected) {
-                      setLoadingPlan(plan.id);
+                      setSelectedPlan(plan.id);
                     } else {
                       handlePayment(plan);
                     }
