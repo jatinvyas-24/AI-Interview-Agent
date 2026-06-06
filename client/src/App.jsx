@@ -11,7 +11,7 @@ import InterviewHistory from "./pages/InterviewHistory";
 import Pricing from "./pages/Pricing";
 import InterviewReport from "./pages/InterviewReport";
 
-export const ServerUrl = "http://localhost:5001";
+export const ServerUrl = "https://ai-interview-agent-3ztp.onrender.com";
 
 const App = () => {
   const dispatch = useDispatch();
