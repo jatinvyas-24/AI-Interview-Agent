@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
@@ -82,27 +82,16 @@ const Pricing = () => {
         order_id: result.data.id,
 
         handler: async (response) => {
-          try {
-            const verifypay = await axios.post(
-              ServerUrl + "/api/payment/verify",
-              response,
-              { withCredentials: true },
-            );
+          const verifypay = await axios.post(
+            ServerUrl + "/api/payment/verify",
+            response,
+            { withCredentials: true },
+          );
 
-            dispatch(setUserData(verifypay.data.user));
+          dispatch(setUserData(verifypay.data.user));
 
-            alert("Payment Successful. Credits Added.");
-            navigate("/");
-          } catch (verifyError) {
-            console.error(verifyError);
-            alert("Payment verification failed: " + (verifyError.response?.data?.message || verifyError.message));
-            setLoadingPlan(null);
-          }
-        },
-        modal: {
-          ondismiss: () => {
-            setLoadingPlan(null);
-          }
+          alert("Payment Successful. Credits Added.");
+          navigate("/");
         },
         theme: {
           color: "#10b981",
@@ -110,11 +99,12 @@ const Pricing = () => {
       };
 
       const rzp = new window.Razorpay(options);
+
       rzp.open();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to initiate payment: " + (error.response?.data?.message || error.message));
+
       setLoadingPlan(null);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -197,7 +187,7 @@ const Pricing = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isSelected) {
-                      setSelectedPlan(plan.id);
+                      setLoadingPlan(plan.id);
                     } else {
                       handlePayment(plan);
                     }

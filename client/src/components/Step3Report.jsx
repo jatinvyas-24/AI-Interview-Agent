@@ -1,3 +1,4 @@
+import React from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
@@ -17,8 +18,6 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const Step3Report = ({ report }) => {
-  const navigate = useNavigate();
-
   if (!report) {
     return (
       <div className="min-h-screen flex items-center justify-center ">
@@ -26,6 +25,8 @@ const Step3Report = ({ report }) => {
       </div>
     );
   }
+
+  const navigate = useNavigate();
 
   const {
     finalScore = 0,
@@ -46,8 +47,8 @@ const Step3Report = ({ report }) => {
     { label: "Correctness", value: correctness },
   ];
 
-  let performanceText;
-  let shortTagline;
+  let performanceText = "";
+  let shortTagline = "";
 
   if (finalScore >= 8) {
     performanceText = "Ready for job opportunities.";
@@ -108,7 +109,7 @@ const Step3Report = ({ report }) => {
 
     currentY += 45;
 
-    let advice;
+    let advice = "";
 
     if (finalScore >= 8) {
       advice =

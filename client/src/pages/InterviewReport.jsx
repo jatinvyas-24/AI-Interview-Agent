@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ServerUrl } from "../App";
 import axios from "axios";
@@ -23,7 +23,7 @@ const InterviewReport = () => {
       }
     };
     fetchReport();
-  }, [id]);
+  },[]);
 
   if (!report) {
     return (

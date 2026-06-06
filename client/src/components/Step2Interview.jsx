@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import maleVideo from "../assets/videos/male-ai.mp4";
 import femaleVideo from "../assets/videos/female-ai.mp4";
 import Timer from "./Timer";
@@ -23,25 +23,9 @@ const Step2Interview = ({ interviewData, onFinish }) => {
   const [voiceGender, setVoiceGender] = useState("female");
   const [subtitle, setSubtitle] = useState("");
   const [isTimerActive, setIsTimerActive] = useState(false);
-  const [micSupported, setMicSupported] = useState(() => typeof window !== "undefined" && "webkitSpeechRecognition" in window);
+  const [micSupported, setMicSupported] = useState(true);
 
   const videoRef = useRef(null);
-
-  const startMic = useCallback(() => {
-    if (recognitionRef.current && !isAIPlaying) {
-      try {
-        recognitionRef.current.start();
-      } catch {
-        // Ignore error if recognition is already active
-      }
-    }
-  }, [isAIPlaying]);
-
-  const stopMic = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
-  }, []);
 
   const currentQuestion = questions[currentIndex];
 
@@ -86,7 +70,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
   const videoSource = voiceGender === "male" ? maleVideo : femaleVideo;
 
-  const speakText = useCallback((text) => {
+  const speakText = (text) => {
     return new Promise((resolve) => {
       if (!window.speechSynthesis || !selectedVoice) {
         resolve();
@@ -128,7 +112,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
       setSubtitle(text);
       window.speechSynthesis.speak(utterance);
     });
-  }, [selectedVoice, isMicOn, startMic, stopMic]);
+  };
 
   useEffect(() => {
     if (!selectedVoice) return;
@@ -154,7 +138,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     };
 
     runIntro();
-  }, [selectedVoice, isIntroPhase, currentIndex, currentQuestion, isMicOn, questions.length, speakText, userName, startMic]);
+  }, [selectedVoice, isIntroPhase, currentIndex]);
 
   useEffect(() => {
     if (!isTimerActive) return;
@@ -171,10 +155,17 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isTimerActive, currentIndex, currentQuestion]);
+  }, [isTimerActive, currentIndex]);
+
+  useEffect(() => {
+    if (!isIntroPhase && currentQuestion) {
+      setTimeLeft(currentQuestion.timeLimit || 60);
+    }
+  }, [currentIndex]);
 
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
+      setMicSupported(false);
       return;
     }
     const recognition = new window.webkitSpeechRecognition();
@@ -200,12 +191,24 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     try {
       recognition.start();
       recognition.stop();
-    } catch {
-      // Ignore error during initial test run
-    }
+    } catch (e) {}
 
     recognitionRef.current = recognition;
   }, []);
+
+  const startMic = () => {
+    if (recognitionRef.current && !isAIPlaying) {
+      try {
+        recognitionRef.current.start();
+      } catch (error) {}
+    }
+  };
+
+  const stopMic = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+  };
 
   const toggleMic = () => {
     if (isMicOn) {
@@ -216,7 +219,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     setIsMicOn(!isMicOn);
   };
 
-  const submitAnswer = useCallback(async () => {
+  const submitAnswer = async () => {
     if (isSubmitting) return;
 
     stopMic();
@@ -241,7 +244,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
       console.log(error);
       setIsSubmitting(false);
     }
-  }, [isSubmitting, interviewId, currentIndex, answer, currentQuestion, timeLeft, speakText, stopMic]);
+  };
 
   const handleNext = async () => {
     setAnswer("");
@@ -255,11 +258,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
     await speakText("Alright, let's move to the next question.");
 
-    const nextIndex = currentIndex + 1;
-    setCurrentIndex(nextIndex);
-    const nextQuestion = questions[nextIndex];
-    setTimeLeft(nextQuestion?.timeLimit || 60);
-
+    setCurrentIndex(currentIndex + 1);
     setTimeout(() => {
       if (isMicOn) startMic();
     }, 500);
@@ -287,12 +286,9 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     if (!currentQuestion) return;
 
     if (timeLeft === 0 && !isSubmitting && !feedback) {
-      const timerId = setTimeout(() => {
-        submitAnswer();
-      }, 0);
-      return () => clearTimeout(timerId);
+      submitAnswer();
     }
-  }, [timeLeft, isIntroPhase, currentQuestion, isSubmitting, feedback, submitAnswer]);
+  }, [timeLeft]);
 
   useEffect(() => {
     return () => {

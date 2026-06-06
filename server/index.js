@@ -12,7 +12,7 @@ import paymentRouter from "./src/routes/payment.route.js";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5175",
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );
@@ -25,7 +25,7 @@ app.use("/api/user", userRouter);
 app.use("/api/interview", interviewRouter);
 app.use("/api/payment", paymentRouter);
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   connectDB();

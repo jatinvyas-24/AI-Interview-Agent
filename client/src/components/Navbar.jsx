@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { motion } from "motion/react";
 import { BsRobot, BsCoin } from "react-icons/bs";
 import { HiOutlineLogout } from "react-icons/hi";
 import { FaUserAstronaut } from "react-icons/fa";
+import { userSlice } from "../redux/userSlice"
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ServerUrl } from "../App";
@@ -93,8 +94,8 @@ export const Navbar = () => {
               }}
               className="w-9 h-9 bg-black text-white rounded-full flex items-center justify-center font-semibold "
             >
-              {userData && userData.name ? (
-                userData.name.slice(0, 1).toUpperCase()
+              {userData ? (
+                userData?.name.slice(0, 1).toUpperCase()
               ) : (
                 <FaUserAstronaut size={16} />
               )}

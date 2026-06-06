@@ -1,3 +1,4 @@
+import React from "react";
 import { BsRobot } from "react-icons/bs";
 import { IoSparkles } from "react-icons/io5";
 import { motion } from "motion/react";
@@ -23,7 +24,6 @@ const Auth = ({ isModel = false }) => {
         { name, email },
         { withCredentials: true },
       );
-      console.log(result.data);
 
       dispatch(setUserData(result.data));
     } catch (error) {
